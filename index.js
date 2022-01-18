@@ -2,6 +2,9 @@ const express = require('express');
 const fs = require('fs').promises;
 const bodyParser = require('body-parser');
 
+const validateEmail = require('./middlewares/validateEmail');
+const validatePassword = require('./middlewares/validatePassword');
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -27,6 +30,9 @@ app.get('/talker/:id', async (req, res) => {
   if (!talkerId) return res.status(404).json({ message: `${NotFound}` });
   return res.status(200).json(talkerId);
 });
+
+app.post('/login', validatePassword, validateEmail, (request, response) => response
+.status(200).json({ token: '7mqaVRXJSp886CGr' }));
 
 app.listen(PORT, () => {
   console.log('Online');
