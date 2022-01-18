@@ -31,6 +31,7 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(200).json(talkerId);
 });
 
+// tive ajuda de colegas na sala do zoom para resolver problemas no teste
 app.post('/login', validatePassword, validateEmail, (request, response) => response
 .status(200).json({ token: '7mqaVRXJSp886CGr' }));
 
