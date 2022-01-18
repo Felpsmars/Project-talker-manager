@@ -1,9 +1,16 @@
 const express = require('express');
 const fs = require('fs').promises;
+const { writeFile, readFile } = require('fs').promises;
 const bodyParser = require('body-parser');
 
 const validateEmail = require('./middlewares/validateEmail');
 const validatePassword = require('./middlewares/validatePassword');
+const validateAge = require('./middlewares/validateAge');
+const validateName = require('./middlewares/validateName');
+const validateToken = require('./middlewares/validateToken');
+const validateTalk = require('./middlewares/validateTalk');
+const validateRate = require('./middlewares/validateRate');
+const validateWatchedAT = require('./middlewares/validateWatchedAT');
 
 const app = express();
 app.use(bodyParser.json());
@@ -16,6 +23,28 @@ const PORT = '3000';
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
+
+app.post(
+  '/talker',
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateRate,
+  validateWatchedAT,
+  async (req, res) => {
+  const { name, age, talk } = req.body;
+  const talker = JSON.parse(await fs.readFile('talker.json', 'utf-8'));
+
+  const newTalker = { age, id: talker.length + 1, name, talk };
+  const newTalkers = [...talker, newTalker];
+
+  talker.push(newTalkers);
+  await writeFile('talker.json', JSON.stringify(newTalkers));
+
+  return res.status(201).json(newTalker);
+},
+);
 
 app.get('/talker', async (req, res) => {
   const talker = await fs.readFile('talker.json', 'utf-8');
