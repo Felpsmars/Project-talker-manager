@@ -1,6 +1,6 @@
 const express = require('express');
 const fs = require('fs').promises;
-const { writeFile, readFile } = require('fs').promises;
+const { writeFile } = require('fs').promises;
 const bodyParser = require('body-parser');
 
 const validateEmail = require('./middlewares/validateEmail');
