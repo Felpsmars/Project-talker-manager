@@ -55,6 +55,20 @@ app.get('/talker', async (req, res) => {
 app.post('/login', validatePassword, validateEmail, (request, response) => response
 .status(200).json({ token: '7mqaVRXJSp886CGr' }));
 
+app.delete(
+'/talker/:id',
+validateToken,
+async (req, res) => {
+  const { id } = req.params;
+  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talkerId = JSON.parse(talker).find((r) => r.id === +id);
+  
+  await writeFile('talker.json', JSON.stringify(talkerId));
+  
+  return res.status(204).json();
+},
+);
+
 app.put(
 '/talker/:id',
 validateToken,
