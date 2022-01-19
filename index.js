@@ -55,6 +55,23 @@ app.get('/talker', async (req, res) => {
 app.post('/login', validatePassword, validateEmail, (request, response) => response
 .status(200).json({ token: '7mqaVRXJSp886CGr' }));
 
+app.get(
+'/talker/search',
+validateToken,
+async (req, res) => {
+    const { searchTerm } = req.query;
+    const talker = JSON.parse(await fs.readFile('talker.json', 'utf-8'));
+
+    if (!searchTerm) return res.status(200).json(talker);
+
+    const filter = talker.filter(({ name }) => name.includes(searchTerm));
+
+    if (filter.length === 0) return res.status(200).json([]);
+
+    return res.status(200).json(filter);
+  },
+);
+
 app.delete(
 '/talker/:id',
 validateToken,
