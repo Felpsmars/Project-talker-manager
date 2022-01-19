@@ -34,12 +34,12 @@ app.post(
   validateWatchedAT,
   async (req, res) => {
   const { name, age, talk } = req.body;
+  // eslint-disable-next-line sonarjs/no-duplicate-string
   const talker = JSON.parse(await fs.readFile('talker.json', 'utf-8'));
 
   const newTalker = { age, id: talker.length + 1, name, talk };
   const newTalkers = [...talker, newTalker];
 
-  talker.push(newTalkers);
   await writeFile('talker.json', JSON.stringify(newTalkers));
 
   return res.status(201).json(newTalker);
@@ -51,6 +51,33 @@ app.get('/talker', async (req, res) => {
   return res.status(200).json(JSON.parse(talker));
 });
 
+// tive ajuda de colegas na sala do zoom para resolver problemas no teste
+app.post('/login', validatePassword, validateEmail, (request, response) => response
+.status(200).json({ token: '7mqaVRXJSp886CGr' }));
+
+app.put(
+'/talker/:id',
+validateToken,
+validateName,
+validateAge,
+validateTalk,
+validateRate,
+validateWatchedAT,
+async (req, res) => {
+  const { id } = req.params;
+  const { name, age, talk } = req.body;
+
+  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talkerId = JSON.parse(talker).filter((r) => r.id === +id);
+
+  const editTalker = { id: Number(id), name, age, talk };
+  const editTalkers = [...talkerId, editTalker];
+  await writeFile('talker.json', JSON.stringify(editTalkers));
+
+  return res.status(200).json(editTalker);
+},
+);
+
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
   const talker = await fs.readFile('talker.json', 'utf-8');
@@ -59,10 +86,6 @@ app.get('/talker/:id', async (req, res) => {
   if (!talkerId) return res.status(404).json({ message: `${NotFound}` });
   return res.status(200).json(talkerId);
 });
-
-// tive ajuda de colegas na sala do zoom para resolver problemas no teste
-app.post('/login', validatePassword, validateEmail, (request, response) => response
-.status(200).json({ token: '7mqaVRXJSp886CGr' }));
 
 app.listen(PORT, () => {
   console.log('Online');
