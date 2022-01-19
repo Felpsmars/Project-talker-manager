@@ -15,6 +15,7 @@ const validateWatchedAT = require('./middlewares/validateWatchedAT');
 const app = express();
 app.use(bodyParser.json());
 
+const talkerJson = 'talker.json';
 const NotFound = 'Pessoa palestrante não encontrada';
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -34,20 +35,19 @@ app.post(
   validateWatchedAT,
   async (req, res) => {
   const { name, age, talk } = req.body;
-  // eslint-disable-next-line sonarjs/no-duplicate-string
-  const talker = JSON.parse(await fs.readFile('talker.json', 'utf-8'));
+  const talker = JSON.parse(await fs.readFile(talkerJson, 'utf-8'));
 
   const newTalker = { age, id: talker.length + 1, name, talk };
   const newTalkers = [...talker, newTalker];
 
-  await writeFile('talker.json', JSON.stringify(newTalkers));
+  await writeFile(talkerJson, JSON.stringify(newTalkers));
 
   return res.status(201).json(newTalker);
 },
 );
 
 app.get('/talker', async (req, res) => {
-  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talker = await fs.readFile(talkerJson, 'utf-8');
   return res.status(200).json(JSON.parse(talker));
 });
 
@@ -60,7 +60,7 @@ app.get(
 validateToken,
 async (req, res) => {
     const { searchTerm } = req.query;
-    const talker = JSON.parse(await fs.readFile('talker.json', 'utf-8'));
+    const talker = JSON.parse(await fs.readFile(talkerJson, 'utf-8'));
 
     if (!searchTerm) return res.status(200).json(talker);
 
@@ -77,10 +77,10 @@ app.delete(
 validateToken,
 async (req, res) => {
   const { id } = req.params;
-  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talker = await fs.readFile(talkerJson, 'utf-8');
   const talkerId = JSON.parse(talker).find((r) => r.id === +id);
   
-  await writeFile('talker.json', JSON.stringify(talkerId));
+  await writeFile(talkerJson, JSON.stringify(talkerId));
   
   return res.status(204).json();
 },
@@ -98,12 +98,12 @@ async (req, res) => {
   const { id } = req.params;
   const { name, age, talk } = req.body;
 
-  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talker = await fs.readFile(talkerJson, 'utf-8');
   const talkerId = JSON.parse(talker).filter((r) => r.id === +id);
 
   const editTalker = { id: Number(id), name, age, talk };
   const editTalkers = [...talkerId, editTalker];
-  await writeFile('talker.json', JSON.stringify(editTalkers));
+  await writeFile(talkerJson, JSON.stringify(editTalkers));
 
   return res.status(200).json(editTalker);
 },
@@ -111,7 +111,7 @@ async (req, res) => {
 
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const talker = await fs.readFile('talker.json', 'utf-8');
+  const talker = await fs.readFile(talkerJson, 'utf-8');
   const talkerId = JSON.parse(talker).find((r) => r.id === +id);
 
   if (!talkerId) return res.status(404).json({ message: `${NotFound}` });
